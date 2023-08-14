@@ -1,7 +1,8 @@
+import enum
 X, Y, C = map(int, input().split())
-robot1 = list(map(int, input().split())) #col,raw, direction of init pos of robot
+robot1 = [int(i) for i in input().split()] #col,raw, direction of init pos of robot
 commands1 = input().split() #послідовність команд для робота 1
-robot2 = list(map(int, input().split())) #the same specification
+robot2 = [int(i) for i in input().split()] #the same specification
 commands2 = input().split() #послідовність команд для робота 2
 print(X, Y, C)
 print(robot1)
@@ -11,18 +12,39 @@ print(commands2)
 
 count=0
 
+class Robot:
+    def __init__(self, init_pos_x, init_pos_y, init_dir):
+        self.pos_x = init_pos_x
+        self.pos_y = init_pos_y
+        self.dir = init_dir  # you are not shadowing python's dir() globally, so it's ok
 
-def move(robot,step, X, Y):    #відповідає за рухи робота у різних напрямках
-    for s in range(step):
-        if int(robot[2])==0 and robot[0] < X:
-            robot[0]= int(robot[0])+int(step)
-        elif int(robot[2])==1 and robot[1] < Y:
-            robot[1]=int(robot[1])+int(step)
-        elif int(robot[2])==2 and robot[0] > 1:
-            robot[0]=int(robot[0])-int(step)
-        elif int(robot[2])==3 and robot[1] > 1:
-            robot[1]=int(robot[1])-int(step)
-        if robot[0] > X or robot[1] > Y or robot[0] < 1 or robot[1] < 1: # ось тут
+# robot = Robot(2, 3, 0)
+# robot.pos_x  # instead of robot[0]
+
+
+
+
+class RobotDirection(enum.IntEnum):
+    EAST = 0
+    NORTH = 1
+    WEST = 2
+    SOUTH = 3
+
+# robot = Robot(2, 3, RobotDirection.EAST)
+# robot.dir == RobotDirection.EAST  # instead of robot.dir == 0
+
+
+def move_robot(robot,step, X, Y):    #відповідає за рухи робота у різних напрямках
+    for _ in range(step):
+        if robot.dir == RobotDirection.EAST and robot.pos_x < X:
+            robot.pos_x += 1
+        elif robot.dir == RobotDirection.NORTH and robot.pos_y < Y:
+            robot.pos_y += 1
+        elif robot.dir == RobotDirection.WEST and robot.pos_x > 1:
+            robot.pos_x -= 1
+        elif robot.dir == RobotDirection.SOUTH and robot.pos_y > 1:
+            robot.pos_y -= 1
+        if robot.pos_x > X or robot.pos_y > Y or robot.pos_x < 1 or robot.pos_y < 1: # changed
             break
     return robot
     
@@ -30,26 +52,22 @@ def move(robot,step, X, Y):    #відповідає за рухи робота 
 
     
 
-def dir(robot, dire):   # відповідає за напрямок робота
+def direction_of_robot(robot, dire):   # відповідає за напрямок робота
     if dire=="L":
-        if robot[2]==3:
-            robot[2]=0
+        if robot.dir == RobotDirection.SOUTH:
+            robot.dir == RobotDirection.EAST
             return robot
         else:
-            robot[2]=int(robot[2])+1
+            robot.dir = RobotDirection(robot.dir + 1)
             return robot
     if dire == "R":
-        if robot[2] == 0:
-            robot[2] = 3
+        if robot.dir == RobotDirection.EAST:
+            robot.dir == RobotDirection.SOUTH
         else:
-            robot[2] = robot[2] - 1
+            robot.dir = RobotDirection(robot.dir - 1)
         return robot
 
-    
-# def stuk(robot, X, Y):
-#     if robot[0] >= X or robot[1] >= Y or robot[0] <= 0 or robot[1] <= 0:
-#         return False
-#     return True
+
 
     
 
@@ -58,31 +76,23 @@ C1 = 0  #проходження циклів , які мають пройти р
 while C1 < C:
     for i in commands1:
         if i == "L":
-            robot1 = dir(robot1, i)
+            robot1 = direction_of_robot(robot1, i)
         elif i == "R":
-            robot1 = dir(robot1, i)
+            robot1 = direction_of_robot(robot1, i)
         else:
-            robot1 = move(robot1, int(i), X, Y)
+            robot1 = move_robot(robot1, int(i), X, Y)
             count += 1
 
     for i in commands2:
         if i == "L":
-            robot2 = dir(robot2, i)
+            robot2 = direction_of_robot(robot2, i)
         elif i == "R":
-            robot2 = dir(robot2, i)
+            robot2 = direction_of_robot(robot2, i)
         else:
             print(robot1)
-            robot2 = move(robot2, int(i), X, Y)
+            robot2 = move_robot(robot2, int(i), X, Y)
             count += 1 
             
     C1 += 1
 
 print(count)
-
-#тест
-# 8 6 5
-# 2 4 0
-# 4 L 2 L
-# 6 1 1
-# 6 5 R
-
