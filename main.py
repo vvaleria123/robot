@@ -93,6 +93,10 @@ for _ in range(C):
         else:
             robot1 = move_robot(robot1, int(i), X, Y)
             count += 1
+    if robot1.check_collision(robot2):
+        count -= 1
+    if robot2.check_collision(robot1):
+        count -= 1
 
     for i in commands2:
         if i == "L":
@@ -104,5 +108,7 @@ for _ in range(C):
             robot2 = move_robot(robot2, int(i), X, Y)
             count += 1
     if robot1.check_collision(robot2):
-        count -= 1 
+        count -= 1
+    if robot2.check_collision(robot1):
+        count -= 1
 print(count)
